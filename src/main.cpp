@@ -17,37 +17,37 @@
 #include "translator.hpp"
 
 static std::map<std::string, uint64_t> test_cases_english = {
-		{"zero",0},
-		{"one hundred twenty",120},
+		{"eleven hundred", 1100},
 		{"eleven hundred million", 1100000000},
-		{"one thousand one hundred million", 1100000000},
-		{"thirteen million", 13000000},
+		{"eleven thousand one hundred eleven", 11111},
 		{"five hundred one", 501},
 		{"five thousand", 5000},
 		{"five thousand thirty three", 5033},
 		{"forty seven", 47},
-		{"eleven hundred", 1100},
+		{"one hundred twenty",120},
+		{"one thousand one hundred million", 1100000000},
+		{"thirteen million", 13000000},
 		{"one hundred eleven", 111},
 		{"one thousand one hundred eleven", 1111},
-		{"eleven thousand one hundred eleven", 11111},
 		{"one hundred eleven thousand one hundred eleven", 111111},
-		{"one million one hundred eleven thousand one hundred eleven", 1111111}
+		{"one million one hundred eleven thousand one hundred eleven", 1111111},
+		{"zero",0}
 };
 
 static std::map<std::string, uint64_t> test_cases_spanish = {
 		{"cero", 0},
+		{"ciento once", 111},
+		{"ciento once mil", 111000},
+		{"ciento once mil ciento once", 111111},
 		{"ciento veinte", 120},
+		{"mil millones mil quinientos veinte y cinco", 1000001525},
 		{"mil quinientos", 1500},
 		{"mil quinientos millones", 1500000000},
 		{"mil quinientos veinte y cinco", 1525},
-		{"mil millones mil quinientos veinte y cinco", 1000001525},
-		{"ciento once", 111},
 		{"mil ciento once", 1111},
-		{"once mil ciento once", 11111},
-		{"ciento once mil ciento once", 111111},
 		{"mil ciento once mil ciento once", 1111111},
-		{"ciento once mil", 111000},
-		{"novecientos ochenta siete millones seis cientos cincuenta cuatro mil tres cientos veintiuno",987654321}
+		{"novecientos ochenta siete millones seis cientos cincuenta y cuatro mil tres cientos veintiuno",987654321},
+		{"once mil ciento once", 11111},
 
 };
 
