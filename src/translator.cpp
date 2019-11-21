@@ -27,7 +27,7 @@ bool MemoryDictionary::hasWord(const std::string& word) const {
 
 
 /*
- * Translate selected word
+ * Translate selected word. Its kind of class factory
  */
 WordTranslator* MemoryDictionary::translateWord(const std::string& word) const {
 	auto properties = this->values->getValueProperties(word);
@@ -48,7 +48,7 @@ void MemoryDictionary::changeLanguage(LANGUAGES language) {
 };
 
 /*Word Translator:
- * tree flavours:
+ * three flavours:
  * WordAccumulatorTranslator -> For accumulator Values
  * UnityTranslator -> FOr Unity values
  * WordAccumulatorTranslator is different than UnityTranslator because they have different behavour on chaining values and
@@ -100,13 +100,13 @@ void WordAccumulatorTranslator::chainValue(std::stack<std::string>& new_words) {
 		UnityTranslator word_root(this->dictionary);
 		std::stack<std::string> m_stack(all_values);
 		word_root.chainValue(m_stack);
-		this->final_value *= word_root.colapse();
+		this->final_value *= word_root.collapse();
 	}
 };
 
-uint64_t WordAccumulatorTranslator::colapse() const {
+uint64_t WordAccumulatorTranslator::collapse() const {
 	uint64_t inherit_value = 0;
-	if(this->getNextLink() != NULL) inherit_value = this->next_link->colapse();
+	if(this->getNextLink() != NULL) inherit_value = this->next_link->collapse();
 	return this->final_value + inherit_value;
 };
 
@@ -143,9 +143,9 @@ void UnityTranslator::chainValue(std::stack<std::string>& new_words) {
 	}
 };
 
-uint64_t UnityTranslator::colapse() const {
+uint64_t UnityTranslator::collapse() const {
 	uint64_t inherit_value = 0;
-	if(this->getNextLink() != NULL) inherit_value = this->next_link->colapse();
+	if(this->getNextLink() != NULL) inherit_value = this->next_link->collapse();
 	//std::cout<<"Value: "<< this->final_value + inherit_value<<std::endl;
 	return this->final_value + inherit_value;
 };
@@ -162,7 +162,7 @@ UnityTranslator::~UnityTranslator(){
 	if(this->getNextLink() != NULL) delete this->getNextLink();
 };
 
-uint64_t WordSingleTranslator::colapse() const{
+uint64_t WordSingleTranslator::collapse() const{
 	return this->getValue();
 };
 
@@ -204,8 +204,11 @@ std::string NumberTranslator::getText(){
 	return this->text;
 };
 
+/*
+ * collapse will go link by link adding values and getting the final value
+ */
 uint64_t NumberTranslator::calculateValues() {
-	return this->word_root->colapse();
+	return this->word_root->collapse();
 };
 
 void NumberTranslator::createTree(std::stack<std::string>& word_vector){

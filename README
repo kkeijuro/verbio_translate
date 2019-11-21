@@ -7,8 +7,13 @@ two hundred two -> 202
 
 It works only with position integer number limited to uint64_t size
 
+We try to make a code that may grow without touching the code, for example 
+adding new words or new languages, thats why translator and dictionary was decoupled,
+ideally translators code should never be changed.
+
 Basically is based on the idea of the composite pattern
 (but it looks more like a linked list)
+
 Each accumulator of values links with the next one through a pointer
 
 2 main actors:

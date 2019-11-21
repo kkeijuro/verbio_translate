@@ -18,7 +18,7 @@ class WordTranslator {
 	public:
 	WordTranslator();
 	virtual void chainValue(std::stack<std::string>& new_word)= 0;
-	virtual uint64_t colapse() const = 0;
+	virtual uint64_t collapse() const = 0;
 	WordTranslator* getNextLink() const ;
 	void setNextLink(WordTranslator* next_link);
 	virtual ~WordTranslator();
@@ -32,7 +32,7 @@ class WordSingleTranslator: public WordTranslator {
 	public:
 	WordSingleTranslator(uint64_t value);
 	void chainValue(std::stack<std::string>& new_word);
-	uint64_t colapse() const;
+	uint64_t collapse() const;
 	WORDTYPE getType() const;
 	uint64_t getValue() const;
 	WordTranslator* getNextLink() const { return NULL;};
@@ -47,7 +47,7 @@ class WordAccumulatorTranslator: public WordTranslator {
 	public:
 	WordAccumulatorTranslator(uint64_t value, const Dictionary *dictionary);
 	void chainValue(std::stack<std::string>& new_word);
-	uint64_t colapse() const;
+	uint64_t collapse() const;
 	WORDTYPE getType() const;
 	uint64_t getValue() const;
 	WordTranslator* getNextLink() const {return this->next_link;};
@@ -66,7 +66,7 @@ class UnityTranslator: public WordTranslator {
 	public:
 	UnityTranslator(const Dictionary *dictionary);
 	void chainValue(std::stack<std::string>& new_word);
-	uint64_t colapse() const;
+	uint64_t collapse() const;
 	WORDTYPE getType() const;
 	uint64_t getValue() const;
 	WordTranslator* getNextLink() const {return this->next_link;};
