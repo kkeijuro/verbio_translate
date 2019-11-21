@@ -1,0 +1,33 @@
+String to Number implementation:
+
+This code transforms a Number written in word to the equivalent number.
+For example:
+
+two hundred two -> 202
+
+It works only with position integer number limited to uint64_t size
+
+Basically is based on the idea of the composite pattern
+(but it looks more like a linked list)
+Each accumulator of values links with the next one through a pointer
+
+2 main actors:
+Dictionary
+Translator
+
+Dictionary will take care of translating each string value into a number:
+Dictionary has two types of variables: ACCUMULATORS AND SINGLE
+Accumulators can accumulate values (Hundred, million, thousand..)
+Single can not
+Translator will use the dictionary to translate each value and accumulate values
+
+As an example:
+one million one hundred eleven thousand one hundred eleven
+
+1.- Split string 
+2.- Save values in a Stack reverse ordered
+3.- We begin from a Unity word accumulator 
+4.- we pass the full Stack to the accumulator
+5.- Accumulate each value in the accumulator, until a greater accumulator is found
+6.- if a new accumulator is found change accumulator and go back to 4
+ 
