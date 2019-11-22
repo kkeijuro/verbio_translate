@@ -89,8 +89,9 @@ const WordInformation& SpanishValues::getValueProperties(std::string word){
 };
 
 SpanishValues::SpanishValues(){
-	this->values.insert({"y", {0, WORDTYPE::SINGLE}});
+	this->values.insert({"y", {0, WORDTYPE::TEXT_IN_NUMBER}});
 	this->values.insert({"cero", {0, WORDTYPE::SINGLE}});
+	this->values.insert({"un", {1, WORDTYPE::SINGLE}});
 	this->values.insert({"uno", {1, WORDTYPE::SINGLE}});
 	this->values.insert({"dos", {2, WORDTYPE::SINGLE}});
 	this->values.insert({"tres", {3, WORDTYPE::SINGLE}});

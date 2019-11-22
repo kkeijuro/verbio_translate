@@ -7,8 +7,10 @@
  */
 
 #include <memory>
+#include <queue>
 #include <set>
 #include <stack>
+#include <sstream>
 #include "dictionary.hpp"
 
 #ifndef INCLUDE_TRANSLATOR_HPP_
@@ -30,7 +32,7 @@ class WordTranslator {
 
 class WordSingleTranslator: public WordTranslator {
 	public:
-	WordSingleTranslator(uint64_t value);
+	WordSingleTranslator(uint64_t value, WORDTYPE type);
 	void chainValue(std::stack<std::string>& new_word);
 	uint64_t collapse() const;
 	WORDTYPE getType() const;
@@ -39,7 +41,7 @@ class WordSingleTranslator: public WordTranslator {
 	void setNextLink(WordTranslator* next_link){};
 	virtual ~WordSingleTranslator(){};
 	private:
-	static WORDTYPE type;
+	WORDTYPE type;
 	uint64_t value;
 };
 
@@ -92,19 +94,31 @@ class MemoryDictionary: public Dictionary {
 
 class NumberTranslator {
 	public:
-	NumberTranslator(Dictionary* dictionary);
+	NumberTranslator(const Dictionary* dictionary);
 	~NumberTranslator();
-	uint64_t toNumber(const std::string& sentence_number);
+	uint64_t toNumber(std::stack<std::string>& return_vector);
 	std::string getText();
 	private:
-	const Dictionary* const dictionary;
+	const Dictionary* dictionary;
 	std::string text;
 	uint64_t value;
 	UnityTranslator *word_root;
 	void createTree(std::stack<std::string>& word_vector);
 	uint64_t calculateValues();
-	static void split(std::string strToSplit, char delimeter, std::stack<std::string>& vector);
-
-
 };
+
+class SentenceTranslator {
+	public:
+	~SentenceTranslator();
+	std::string translate(const std::string& string_to_translate);
+	SentenceTranslator(LANGUAGES language);
+	private:
+	void setDictionary(const Dictionary * dictionary);
+	std::string translateNumber(std::queue<std::string>& words);
+	const Dictionary* dictionary;
+	std::stringstream* final_sentence;
+	static std::queue<std::string>& split(std::string strToSplit, char delimeter);
+};
+
+
 #endif /* INCLUDE_TRANSLATOR_HPP_ */

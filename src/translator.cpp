@@ -8,6 +8,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <queue>
 #include <sstream>
 #include <string>
 #include <stack>
@@ -34,8 +35,9 @@ WordTranslator* MemoryDictionary::translateWord(const std::string& word) const {
 	switch(properties.getType()) {
 	case ACCUMULATOR:
 		return new WordAccumulatorTranslator(properties.getValue(), this);
+	case TEXT_IN_NUMBER:
 	case SINGLE:
-		return new WordSingleTranslator(properties.getValue());
+		return new WordSingleTranslator(properties.getValue(), properties.getType());
 	};
 	return NULL;
 };
@@ -126,7 +128,6 @@ WordAccumulatorTranslator::~WordAccumulatorTranslator(){
 	if(this->getNextLink() != NULL) delete this->getNextLink();
 };
 
-WORDTYPE WordSingleTranslator::type = WORDTYPE::SINGLE;
 UnityTranslator::UnityTranslator(const Dictionary* dictionary): final_value(0), next_link(NULL), word_accumulator(1, dictionary){};
 
 void UnityTranslator::chainValue(std::stack<std::string>& new_words) {
@@ -166,14 +167,14 @@ uint64_t WordSingleTranslator::collapse() const{
 	return this->getValue();
 };
 
-WordSingleTranslator::WordSingleTranslator(uint64_t value): value(value){};
+WordSingleTranslator::WordSingleTranslator(uint64_t value, WORDTYPE type): type(type), value(value){};
 
 void WordSingleTranslator::chainValue(std::stack<std::string>& new_word) {
 	throw std::runtime_error("Unable to chain value on Single Value");
 };
 
 WORDTYPE WordSingleTranslator::getType() const {
-	return WordSingleTranslator::type;
+	return this->type;
 };
 
 uint64_t WordSingleTranslator::getValue() const{
@@ -181,7 +182,7 @@ uint64_t WordSingleTranslator::getValue() const{
 };
 
 
-NumberTranslator::NumberTranslator(Dictionary* dictionary):
+NumberTranslator::NumberTranslator(const Dictionary* dictionary):
 		dictionary(dictionary),
 		value(0),
 		word_root(NULL){};
@@ -190,12 +191,9 @@ NumberTranslator::~NumberTranslator(){
 	delete word_root;
 };
 
-uint64_t NumberTranslator::toNumber(const std::string& sentence_number){
+uint64_t NumberTranslator::toNumber(std::stack<std::string>& values){
 	if(this->word_root) delete word_root;
 	this->word_root = new UnityTranslator(this->dictionary);
-	std::stack<std::string> values;
-	this->text = sentence_number;
-	NumberTranslator::split(this->text, ' ', values);
 	this->createTree(values);
 	return this->calculateValues();
 };
@@ -215,10 +213,75 @@ void NumberTranslator::createTree(std::stack<std::string>& word_vector){
 	this->word_root->chainValue(word_vector);
 };
 
-void NumberTranslator::split(std::string str_to_split, char delimeter, std::stack<std::string>& return_vector) {
+
+SentenceTranslator::~SentenceTranslator(){};
+
+void SentenceTranslator::setDictionary(const Dictionary* dictionary) {
+	this->dictionary = dictionary;
+};
+
+std::string SentenceTranslator::translate(const std::string& string_to_translate) {
+	auto words = SentenceTranslator::split(string_to_translate, ' ');
+	while(words.size() != 0) {
+		auto word = words.front();
+		if(!this->dictionary->hasWord(word)) {
+			*final_sentence << word << " ";
+			words.pop();
+		}
+		else *final_sentence << this->translateNumber(words) << " ";
+	}
+	return final_sentence->str();
+};
+
+std::queue<std::string>& SentenceTranslator::split(std::string str_to_split, char delimeter) {
+	std::queue<std::string>* sentence_words = new std::queue<std::string>();
 	std::stringstream ss(str_to_split);
 	std::string item;
 	while (std::getline(ss, item, delimeter)) {
-		return_vector.push(item);
+		sentence_words->push(item);
 	}
+	return *sentence_words;
+};
+
+SentenceTranslator::SentenceTranslator(LANGUAGES language){
+	this->dictionary = new MemoryDictionary(language);
+	this->final_sentence = new std::stringstream;
+};
+
+struct dotted : std::numpunct<char> {
+    char do_thousands_sep()   const { return '.'; }  // separate with dots
+    std::string do_grouping() const { return "\3"; } // groups of 3 digits
+    static void imbue(std::ostream &os) {
+        os.imbue(std::locale(os.getloc(), new dotted));
+    }
+};
+
+static std::string printInteger(uint64_t value) {
+	std::stringstream ss;
+    dotted::imbue(ss);
+    ss << value;
+    return ss.str();
+};
+
+std::string SentenceTranslator::translateNumber(std::queue<std::string>& words) {
+	std::stack<std::string> numbers;
+	auto word = words.front();
+	words.pop();
+	WordTranslator* translated_word = this->dictionary->translateWord(word);
+	if(translated_word->getType() == WORDTYPE::TEXT_IN_NUMBER) return word;
+	else numbers.push(word);
+	bool out = false;
+	while(!out) {
+		auto word = words.front();
+		if(this->dictionary->hasWord(word)) {
+			if(!(translated_word->getType() == WORDTYPE::TEXT_IN_NUMBER)) {
+				numbers.push(word);
+			}
+			words.pop();
+		}
+		else out = true;
+	}
+	NumberTranslator number_translator(this->dictionary);
+	uint64_t value = number_translator.toNumber(numbers);
+	return printInteger(value);
 };

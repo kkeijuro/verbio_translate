@@ -19,8 +19,9 @@ enum LANGUAGES: uint8_t {
 };
 
 enum WORDTYPE: uint8_t {
-	SINGLE,
-	ACCUMULATOR,
+	TEXT_IN_NUMBER = 0,
+	SINGLE = 54,
+	ACCUMULATOR = 109,
 };
 
 class WordInformation {
